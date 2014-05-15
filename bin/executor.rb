@@ -4,9 +4,10 @@ class Executor
   attr_accessor :execution_hash
   
   # Read and initialize config settings
-  def initialize(url, execution_hash)
+  def initialize(url, execution_hash, test_data)
     @url = url
     @execution_hash = execution_hash
+    @test_data = test_data
     @time_init = Time.new.strftime("%d%m%y_%H%M%S")
   end
 
@@ -33,11 +34,19 @@ class Executor
           end
           if before_steps
             before_steps.each do |before_step|
-              result = execute_test_step(module_name, test[0], before_step[0], before_step[1], before_step[2], before_step[3], before_step[4])
+              if @test_data[before_step[4]]
+                result = execute_test_step(module_name, test[0], before_step[0], before_step[1], before_step[2], before_step[3], @test_data[before_step[4]])
+              else
+                result = execute_test_step(module_name, test[0], before_step[0], before_step[1], before_step[2], before_step[3], before_step[4])
+              end
               results <<  result if !result.empty?
             end
           end
-          result = execute_test_step(module_name, test[0], test[1], test[2], test[3], test[4], test[5])
+          if @test_data[test[5]]
+            result = execute_test_step(module_name, test[0], test[1], test[2], test[3], test[4], @test_data[test[5]])
+          else
+            result = execute_test_step(module_name, test[0], test[1], test[2], test[3], test[4], test[5])
+          end
           results <<  result if !result.empty?
         end
         teardown if @driver
