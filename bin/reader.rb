@@ -1,5 +1,3 @@
-require "spreadsheet"
-
 class Reader
   attr_accessor :url, :execution_hash
   def initialize(filename)
@@ -8,9 +6,9 @@ class Reader
   end
 
   def status
-    log_break
+    FWConfig.log_break
     print "Parsing file: #{@filename}"
-    log_break
+    FWConfig.log_break
     filepath =  File.expand_path("../data/#{@filename}", File.dirname(__FILE__))
     book = Spreadsheet.open filepath
     print "Number of sheets in data file: #{book.worksheets.count} ["
@@ -22,17 +20,18 @@ class Reader
       end
     end
 
-    log_break
+    FWConfig.log_break
 
     # Summarize Config Sheet
     print "\nConfig Sheet:\n\n"
     config_sheet = book.worksheet 0
     config_sheet.drop(1).each do |row|
       @url = row[0]
-      print "URL: #{row[0]}\nDriver Type: #{row[1]}"
+      print "URL: #{row[0]}\nDriver Type: #{row[1]}\nPerform Default steps: #{row[2]}\n"
+      @default_steps = row[2]
     end
 
-    log_break
+    FWConfig.log_break
 
     # Summarize Execution Manager Sheet
     print "\nExecution Manager:\n\n"
@@ -52,7 +51,7 @@ class Reader
       end
     end
     print "Total number of tests to execute: #{counter}"
-    log_break
+    FWConfig.log_break
 
     @execution_hash.each do |module_name, test_list|
       execution_rows = []
@@ -70,11 +69,32 @@ class Reader
       end
       @execution_hash[module_name] = execution_rows
     end
+
+    if (@default_steps =~ /y/i) 
+      if (book.worksheet 'before')
+        print "NOTE: Defaults steps provided, these steps will be executed before each of the tests.\n"
+        before_sheet = book.worksheet 'before'
+        @execution_hash["before"] = []
+        before_sheet.drop(1).each do |row|
+          temp = []
+          row.each do |value|
+            temp << value
+          end
+          @execution_hash["before"] << temp
+        end
+        true
+      else
+        print "\nALERT: Config specifies 'Default steps: Y', but could not find default steps in workbook.\n\nDo you want to continue? (y/N) "
+        if gets.chomp! =~ /y/i
+          true
+        else
+          false
+        end
+      end
+    else
+      return true
+    end
   end
 
-  private 
-    def log_break
-      print "\n--------------------------------------------------------------------------------\n"
-    end
-  
+ 
 end

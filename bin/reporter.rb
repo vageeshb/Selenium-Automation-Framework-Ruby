@@ -7,7 +7,7 @@ class Reporter
     if !filename
       @filename = time_init
     else
-      @filename = time_init + "_#{filename.to_s}"
+      @filename = filename.to_s
     end
 
     @f = File.new("./reports/" + @filename + ".html",  "w+")
@@ -69,7 +69,8 @@ class Reporter
         when "SKIP"
           "<tr class='warning'><td>#{module_name}</td><td>#{test_name}</td><td>#{test_step_name}</td><td>#{status}</td></tr>\n"
         else
-          "<tr class='danger'><td>#{module_name}</td><td>#{test_name}</td><td>#{test_step_name}</td><td>#{status}</td></tr>\n"
+          error_file_path = "./errors/#{@filename}/#{module_name}_#{test_name}_#{test_step_name}.png"
+          "<tr class='danger'><td>#{module_name}</td><td>#{test_name}</td><td>#{test_step_name}</td><td><a href='#{error_file_path}'>#{status}</a></td></tr>\n"
       end
     end
 end
