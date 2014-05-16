@@ -8,8 +8,8 @@ class FWConfig
     return @driver, @wait
   end
 
-  def createErrorFolder(folder_name)
-    folder_path = File.expand_path("../reports/errors/#{folder_name}", File.dirname(__FILE__))
+  def createFolder(folder_name)
+    folder_path = File.expand_path("../reports/#{folder_name}", File.dirname(__FILE__))
     Dir.mkdir(folder_path, 0700) if !(Dir.exists? folder_path)
   end
 

@@ -7,7 +7,8 @@ class Reporter
     else
       @filename = filename.to_s
     end
-    @f = File.new(File.expand_path("../reports/", File.dirname(__FILE__)) + "/#{@filename.to_s}.html",  "w+")
+    FWConfig.new.createFolder(filename)
+    @f = File.new(File.expand_path("../reports/#{filename}", File.dirname(__FILE__)) + "/report.html",  "w+")
     
     @summary = ""
     @table = ""
@@ -40,10 +41,10 @@ class Reporter
 
   def write
     script = "
-    <link rel='stylesheet' href='../bin/resources/css/bootstrap.min.css' />
+    <link rel='stylesheet' href='../resources/css/bootstrap.min.css' />
     <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
-    <script src='../bin/resources/js/bootstrap.min.js'></script>
-    <script src='../bin/resources/js/report.min.js'></script>"
+    <script src='../resources/js/bootstrap.min.js'></script>
+    <script src='../resources/js/report.min.js'></script>"
     head = "
     <head>
       <title>Test Result Run : #{@filename}</title>
@@ -196,7 +197,7 @@ class Reporter
     end
 
     def get_status(test_list)
-      if (test_list.grep /^(FAIL)/i) || (test_list.include? "SKIP")
+      if !(test_list.grep /FAIL/i).empty?
         "FAIL"
       else
         "PASS"
@@ -257,7 +258,7 @@ class Reporter
                   <td>#{test[3]}</td>
                 </tr>"
             else
-              error_file_path = "./errors/#{@filename}/#{module_name}_#{test[1]}_#{test[2]}.png"
+              error_file_path = "./#{module_name}_#{test[1]}_#{test[2]}.png"
               temp += "
                 <tr class='danger'>
                   <td>#{test[1]}</td>

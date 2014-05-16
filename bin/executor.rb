@@ -102,9 +102,9 @@ class Executor
         return @driver.find_element(hash)
       rescue
         # Element not found -> Raise Exception, return FAIL message and take screenshot
-        FWConfig.new.createErrorFolder(@time_init)
+        FWConfig.new.createFolder(@time_init)
         hash.each do |key, value|
-          @driver.save_screenshot(File.expand_path("../reports/errors/#{@time_init}/#{@current_test}.png", File.dirname(__FILE__)))
+          @driver.save_screenshot(File.expand_path("../reports/#{@time_init}/#{@current_test}.png", File.dirname(__FILE__)))
           teardown
           return TestFailureError.new("Could not locate element: " + key.to_s + "=>" + value.to_s).message
         end
@@ -122,8 +122,8 @@ class Executor
           return "PASS"
         else
           # Invalid Action -> Raise Exception, return FAIL message and take screenshot
-          FWConfig.new.createErrorFolder(@time_init)
-          @driver.save_screenshot(File.expand_path("../reports/errors/#{@time_init}/#{@current_test}.png", File.dirname(__FILE__)))
+          FWConfig.new.createFolder(@time_init)
+          @driver.save_screenshot(File.expand_path("../reports/#{@time_init}/#{@current_test}.png", File.dirname(__FILE__)))
           return "FAIL"
       end
     end
@@ -136,8 +136,8 @@ class Executor
           if @driver.current_url == expected_value
             return "PASS" 
           else
-            FWConfig.new.createErrorFolder(@time_init)
-            @driver.save_screenshot(File.expand_path("../reports/errors/#{@time_init}/#{@current_test}.png", File.dirname(__FILE__)))
+            FWConfig.new.createFolder(@time_init)
+            @driver.save_screenshot(File.expand_path("../reports/#{@time_init}/#{@current_test}.png", File.dirname(__FILE__)))
             return TestFailureError.new("Assertion failed: Expected - '#{expected_value}', Found - '#{actual_value}'").message
           end
       end
